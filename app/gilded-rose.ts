@@ -11,11 +11,20 @@ export class Item {
 }
 
 export class GildedRose {
+    MAX_QUALITY = 50;
+    MIN_QUALITY = 0;
     items: Array<Item>;
+
     rules = {
         'Aged Brie': item => {
             const newSellIn = item.sellIn - 1;
-            const newQuality = Math.min(50, item.quality + 1);
+            const newQuality = item.quality >= this.MAX_QUALITY ?
+                item.quality :
+                Math.min(this.MAX_QUALITY,
+                    item.sellIn <= 0 ?
+                        item.quality + 2 :
+                        item.quality + 1
+                );
 
             return {newSellIn, newQuality};
         },
@@ -24,22 +33,31 @@ export class GildedRose {
         },
         'Backstage passes to a TAFKAL80ETC concert': item => {
             const newSellIn = item.sellIn - 1;
-            const newQuality = Math.min(
-                50,
-                [
-                    [item.sellIn <= 0, 0],
-                    [item.sellIn <= 5, item.quality + 3],
-                    [item.sellIn <= 10, item.quality + 2],
-                    [true, item.quality + 1],
-                ].find(pair => pair[0])?.[1]
-            )
+            const newQuality = [
+                [item.sellIn <= 0, 0],
+                [item.sellIn <= 5, item.quality >= this.MAX_QUALITY ?
+                    item.quality :
+                    Math.min(this.MAX_QUALITY, item.quality + 3)],
+                [item.sellIn <= 10, item.quality >= this.MAX_QUALITY ?
+                    item.quality :
+                    Math.min(this.MAX_QUALITY, item.quality + 2)],
+                [true, item.quality >= this.MAX_QUALITY ?
+                    item.quality :
+                    Math.min(this.MAX_QUALITY, item.quality + 1)],
+            ].find(pair => pair[0])?.[1];
 
             return {newSellIn, newQuality};
         }
     }
     defaultRule = item => {
         const newSellIn = item.sellIn - 1;
-        const newQuality = Math.max(0, item.sellIn <= 0 ? item.quality - 2 : item.quality - 1);
+        const newQuality = item.quality < 0 ?
+            item.quality :
+            Math.max(this.MIN_QUALITY,
+                item.sellIn <= 0 ?
+                    item.quality - 2 :
+                    item.quality - 1
+            );
 
         return {newSellIn, newQuality};
     }
