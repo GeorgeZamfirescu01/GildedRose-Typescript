@@ -11,58 +11,101 @@ export class Item {
 }
 
 export class GildedRose {
+    MAX_QUALITY = 50;
+    MIN_QUALITY = 0;
+
     items: Array<Item>;
+
+    limitBelowMax = (val: number) => {
+        return Math.min(this.MAX_QUALITY, val);
+    }
+    limitAboveMin = (val: number) => {
+        return Math.max(this.MIN_QUALITY, val);
+    }
+
+    rules = {
+        'Aged Brie': (item: Item) => {
+            const sellIn = item.sellIn;
+            const quality = item.quality;
+
+            const newSellIn = item.sellIn - 1;
+            const newQuality =
+                quality >= this.MAX_QUALITY ?
+                quality :
+                this.limitBelowMax(sellIn <= 0 ? quality + 2 : quality + 1);
+
+            return {newSellIn, newQuality};
+        },
+        'Sulfuras, Hand of Ragnaros': (item: Item) => {
+            const sellIn = item.sellIn;
+            const quality = item.quality;
+
+            return {newSellIn: sellIn, newQuality: quality};
+        },
+        'Backstage passes to a TAFKAL80ETC concert': (item: Item) => {
+            const sellIn = item.sellIn;
+            const quality = item.quality;
+
+            const newSellIn = sellIn - 1;
+            const newQuality = [
+                [sellIn <= 0, 0],
+                [sellIn <= 5,
+                    quality >= this.MAX_QUALITY ?
+                    quality :
+                    this.limitBelowMax(quality + 3)],
+                [sellIn <= 10,
+                    quality >= this.MAX_QUALITY ?
+                    quality :
+                    this.limitBelowMax(quality + 2)],
+                [true,
+                    quality >= this.MAX_QUALITY ?
+                    quality :
+                    this.limitBelowMax(quality + 1)],
+            ].find(boolValPair => boolValPair[0])?.[1];
+
+            return {newSellIn, newQuality};
+        },
+        'Conjured Mana Cake': (item: Item) => {
+            const sellIn = item.sellIn;
+            const quality = item.quality;
+
+            const newSellIn = sellIn - 1;
+            const newQuality =
+                quality < 0 ?
+                quality :
+                this.limitAboveMin(sellIn <= 0 ? quality - 4 : quality - 2);
+
+            return {newSellIn, newQuality};
+        },
+    }
+    defaultRule = (item: Item) => {
+        const sellIn = item.sellIn;
+        const quality = item.quality;
+
+        const newSellIn = sellIn - 1;
+        const newQuality =
+            quality < 0 ?
+            quality :
+            this.limitAboveMin(sellIn <= 0 ? quality - 2 : quality - 1);
+
+        return {newSellIn, newQuality};
+    }
 
     constructor(items = [] as Array<Item>) {
         this.items = items;
     }
 
     updateQuality() {
-        for (let i = 0; i < this.items.length; i++) {
-            if (this.items[i].name != 'Aged Brie' && this.items[i].name != 'Backstage passes to a TAFKAL80ETC concert') {
-                if (this.items[i].quality > 0) {
-                    if (this.items[i].name != 'Sulfuras, Hand of Ragnaros') {
-                        this.items[i].quality = this.items[i].quality - 1
-                    }
-                }
-            } else {
-                if (this.items[i].quality < 50) {
-                    this.items[i].quality = this.items[i].quality + 1
-                    if (this.items[i].name == 'Backstage passes to a TAFKAL80ETC concert') {
-                        if (this.items[i].sellIn < 11) {
-                            if (this.items[i].quality < 50) {
-                                this.items[i].quality = this.items[i].quality + 1
-                            }
-                        }
-                        if (this.items[i].sellIn < 6) {
-                            if (this.items[i].quality < 50) {
-                                this.items[i].quality = this.items[i].quality + 1
-                            }
-                        }
-                    }
-                }
+        this.items.forEach(item => {
+            let rule = this.defaultRule;
+            if (this.rules.hasOwnProperty(item.name)) {
+                rule = this.rules[item.name];
             }
-            if (this.items[i].name != 'Sulfuras, Hand of Ragnaros') {
-                this.items[i].sellIn = this.items[i].sellIn - 1;
-            }
-            if (this.items[i].sellIn < 0) {
-                if (this.items[i].name != 'Aged Brie') {
-                    if (this.items[i].name != 'Backstage passes to a TAFKAL80ETC concert') {
-                        if (this.items[i].quality > 0) {
-                            if (this.items[i].name != 'Sulfuras, Hand of Ragnaros') {
-                                this.items[i].quality = this.items[i].quality - 1
-                            }
-                        }
-                    } else {
-                        this.items[i].quality = this.items[i].quality - this.items[i].quality
-                    }
-                } else {
-                    if (this.items[i].quality < 50) {
-                        this.items[i].quality = this.items[i].quality + 1
-                    }
-                }
-            }
-        }
+
+            const {newSellIn, newQuality} = rule(item)
+            item.sellIn = newSellIn;
+            item.quality = newQuality;
+        });
 
         return this.items;
     }

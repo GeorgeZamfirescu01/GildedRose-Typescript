@@ -53,14 +53,18 @@ export const itemListsToTest = [
     ],
 ];
 
+function deepCopy(obj) {
+    return JSON.parse(JSON.stringify(obj));
+}
+
 export function createResults(itemListsToTest: Item[][], daysToTest: number): Item[][][] {
     const itemsAndResults: Item[][][] = [];
 
     itemListsToTest.forEach(items => {
-        const results: Item[][] = [JSON.parse(JSON.stringify(items))];
-        const gildedRose = new GildedRose(JSON.parse(JSON.stringify(items)));
+        const results: Item[][] = [deepCopy(items)];
+        const gildedRose = new GildedRose(deepCopy(items));
         for (let i = 0; i < daysToTest; i++) {
-            results.push(JSON.parse(JSON.stringify(gildedRose.updateQuality())));
+            results.push(deepCopy(gildedRose.updateQuality()));
         }
         itemsAndResults.push(results);
     });
