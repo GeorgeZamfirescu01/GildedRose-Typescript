@@ -47,7 +47,19 @@ export class GildedRose {
             ].find(pair => pair[0])?.[1];
 
             return {newSellIn, newQuality};
-        }
+        },
+        'Conjured Mana Cake': item => {
+            const newSellIn = item.sellIn - 1;
+            const newQuality = item.quality < 0 ?
+                item.quality :
+                Math.max(this.MIN_QUALITY,
+                    item.sellIn <= 0 ?
+                        item.quality - 4 :
+                        item.quality - 2
+                );
+
+            return {newSellIn, newQuality};
+        },
     }
     defaultRule = item => {
         const newSellIn = item.sellIn - 1;

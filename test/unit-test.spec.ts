@@ -17,6 +17,21 @@ describe('Unit tests', () => {
             .quality)
             .to.equal(8);
     })
+    it('Simple conjured quality decrease', () => {
+        expect(new GildedRose([new Item('Conjured Mana Cake', 100, 10)]).updateQuality()[0]
+            .quality)
+            .to.equal(8);
+    })
+    it('Conjured quality decrease cap', () => {
+        expect(new GildedRose([new Item('Conjured Mana Cake', 100, 0)]).updateQuality()[0]
+            .quality)
+            .to.equal(0);
+    })
+    it('Double conjured quality decrease when expired', () => {
+        expect(new GildedRose([new Item('Conjured Mana Cake', 0, 10)]).updateQuality()[0]
+            .quality)
+            .to.equal(6);
+    })
     it('Simple sellIn decrease', () => {
         expect(new GildedRose([new Item('itemName', 100, 10)]).updateQuality()[0]
             .sellIn)
