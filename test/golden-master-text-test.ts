@@ -57,11 +57,10 @@ export function createResults(itemListsToTest: Item[][], daysToTest: number): It
     const itemsAndResults: Item[][][] = [];
 
     itemListsToTest.forEach(items => {
-        items = JSON.parse(JSON.stringify(items));
-        const results: Item[][] = [items];
-        const gildedRose = new GildedRose(items);
+        const results: Item[][] = [JSON.parse(JSON.stringify(items))];
+        const gildedRose = new GildedRose(JSON.parse(JSON.stringify(items)));
         for (let i = 0; i < daysToTest; i++) {
-            results.push(gildedRose.updateQuality());
+            results.push(JSON.parse(JSON.stringify(gildedRose.updateQuality())));
         }
         itemsAndResults.push(results);
     });
