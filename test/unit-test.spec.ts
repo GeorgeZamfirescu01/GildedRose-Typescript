@@ -52,6 +52,11 @@ describe('Unit tests', () => {
             .quality)
             .to.equal(50);
     })
+    it('Triple backstage quality limited increase', () => {
+        expect(new GildedRose([new Item('Backstage passes to a TAFKAL80ETC concert', 5, 48)]).updateQuality()[0]
+            .quality)
+            .to.equal(50);
+    })
     it('Backstage quality collapse when expired', () => {
         expect(new GildedRose([new Item('Backstage passes to a TAFKAL80ETC concert', 0, 50)]).updateQuality()[0]
             .quality)
@@ -64,6 +69,16 @@ describe('Unit tests', () => {
     })
     it('Aged Brie quality increase cap', () => {
         expect(new GildedRose([new Item('Aged Brie', 100, 50)]).updateQuality()[0]
+            .quality)
+            .to.equal(50);
+    })
+    it('Double Aged Brie quality increase', () => {
+        expect(new GildedRose([new Item('Aged Brie', -1, 10)]).updateQuality()[0]
+            .quality)
+            .to.equal(12);
+    })
+    it('Aged Brie quality limited increase', () => {
+        expect(new GildedRose([new Item('Aged Brie', -1, 49)]).updateQuality()[0]
             .quality)
             .to.equal(50);
     })
