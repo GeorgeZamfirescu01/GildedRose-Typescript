@@ -15,61 +15,72 @@ export class GildedRose {
     MIN_QUALITY = 0;
     items: Array<Item>;
 
+    maxBound = val => {
+        return Math.min(this.MAX_QUALITY, val);
+    }
+    minBound = val => {
+        return Math.max(this.MIN_QUALITY, val);
+    }
+
     rules = {
         'Aged Brie': item => {
+            const sellIn = item.sellIn;
+            const quality = item.quality;
             const newSellIn = item.sellIn - 1;
-            const newQuality = item.quality >= this.MAX_QUALITY ?
-                item.quality :
-                Math.min(this.MAX_QUALITY,
-                    item.sellIn <= 0 ?
-                        item.quality + 2 :
-                        item.quality + 1
-                );
+            const newQuality =
+                quality >= this.MAX_QUALITY ?
+                quality :
+                this.maxBound(sellIn <= 0 ? quality + 2 : quality + 1);
 
             return {newSellIn, newQuality};
         },
         'Sulfuras, Hand of Ragnaros': item => {
-            return {newSellIn: item.sellIn, newQuality: item.quality};
+            const sellIn = item.sellIn;
+            const quality = item.quality;
+            return {newSellIn: sellIn, newQuality: quality};
         },
         'Backstage passes to a TAFKAL80ETC concert': item => {
-            const newSellIn = item.sellIn - 1;
+            const sellIn = item.sellIn;
+            const quality = item.quality;
+            const newSellIn = sellIn - 1;
             const newQuality = [
-                [item.sellIn <= 0, 0],
-                [item.sellIn <= 5, item.quality >= this.MAX_QUALITY ?
-                    item.quality :
-                    Math.min(this.MAX_QUALITY, item.quality + 3)],
-                [item.sellIn <= 10, item.quality >= this.MAX_QUALITY ?
-                    item.quality :
-                    Math.min(this.MAX_QUALITY, item.quality + 2)],
-                [true, item.quality >= this.MAX_QUALITY ?
-                    item.quality :
-                    Math.min(this.MAX_QUALITY, item.quality + 1)],
+                [sellIn <= 0, 0],
+                [sellIn <= 5,
+                    quality >= this.MAX_QUALITY ?
+                    quality :
+                    this.maxBound(quality + 3)],
+                [sellIn <= 10,
+                    quality >= this.MAX_QUALITY ?
+                    quality :
+                    this.maxBound(quality + 2)],
+                [true,
+                    quality >= this.MAX_QUALITY ?
+                    quality :
+                    this.maxBound(quality + 1)],
             ].find(pair => pair[0])?.[1];
 
             return {newSellIn, newQuality};
         },
         'Conjured Mana Cake': item => {
-            const newSellIn = item.sellIn - 1;
-            const newQuality = item.quality < 0 ?
-                item.quality :
-                Math.max(this.MIN_QUALITY,
-                    item.sellIn <= 0 ?
-                        item.quality - 4 :
-                        item.quality - 2
-                );
+            const sellIn = item.sellIn;
+            const quality = item.quality;
+            const newSellIn = sellIn - 1;
+            const newQuality =
+                quality < 0 ?
+                quality :
+                this.minBound(sellIn <= 0 ? quality - 4 : quality - 2);
 
             return {newSellIn, newQuality};
         },
     }
     defaultRule = item => {
-        const newSellIn = item.sellIn - 1;
-        const newQuality = item.quality < 0 ?
-            item.quality :
-            Math.max(this.MIN_QUALITY,
-                item.sellIn <= 0 ?
-                    item.quality - 2 :
-                    item.quality - 1
-            );
+        const sellIn = item.sellIn;
+        const quality = item.quality;
+        const newSellIn = sellIn - 1;
+        const newQuality =
+            quality < 0 ?
+            quality :
+            this.minBound(sellIn <= 0 ? quality - 2 : quality - 1);
 
         return {newSellIn, newQuality};
     }

@@ -7,6 +7,11 @@ describe('Unit tests', () => {
             .quality)
             .to.equal(9);
     })
+    it('Simple under quality bound', () => {
+        expect(new GildedRose([new Item('itemName', 100, -42)]).updateQuality()[0]
+            .quality)
+            .to.equal(-42);
+    })
     it('Quality decrease cap', () => {
         expect(new GildedRose([new Item('itemName', 100, 0)]).updateQuality()[0]
             .quality)
@@ -21,6 +26,11 @@ describe('Unit tests', () => {
         expect(new GildedRose([new Item('Conjured Mana Cake', 100, 10)]).updateQuality()[0]
             .quality)
             .to.equal(8);
+    })
+    it('Conjured lower than bound quality', () => {
+        expect(new GildedRose([new Item('Conjured Mana Cake', 100, -33)]).updateQuality()[0]
+            .quality)
+            .to.equal(-33);
     })
     it('Conjured quality decrease cap', () => {
         expect(new GildedRose([new Item('Conjured Mana Cake', 100, 0)]).updateQuality()[0]
